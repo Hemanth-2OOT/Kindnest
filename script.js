@@ -74,7 +74,6 @@ function handleAnalyze() {
             <p>Best,</p>
             <p>The KindNest Team</p>
         `;
-        // In a real application, you would call the sendEmail tool here.
         sendEmail({ to: parentEmail, subject: "Cyberbullying Alert — Emotional Support Recommended", body: emailPreview });
     }
 
@@ -126,7 +125,5 @@ function handleImageUpload(event) {
 }
 
 function simulateOCR(imageFile) {
-    // In a real application, you would use an OCR library to extract text from the image.
-    // For this simulation, we'll just return a hardcoded toxic message.
     return "You are a loser and everyone hates you.";
 }
