@@ -1,4 +1,5 @@
 document.getElementById('analyze-btn').addEventListener('click', handleAnalyze);
+document.getElementById('screenshot-upload').addEventListener('change', handleImageUpload);
 
 // Simulated Gemini API call with keyword analysis
 function analyzeTextWithGemini(text) {
@@ -43,8 +44,15 @@ function analyzeTextWithGemini(text) {
 function handleAnalyze() {
     const text = document.getElementById('text-input').value;
     const parentEmail = document.getElementById('parent-email').value;
+    const imageFile = document.getElementById('screenshot-upload').files[0];
 
-    const geminiResult = analyzeTextWithGemini(text);
+    let contentToAnalyze = text;
+    if (imageFile) {
+        const ocrText = simulateOCR(imageFile);
+        contentToAnalyze += `\n\n[Screenshot Text]: ${ocrText}`;
+    }
+
+    const geminiResult = analyzeTextWithGemini(contentToAnalyze);
     const toxicity = parseInt(geminiResult.toxicity_score);
 
     let emotionalSupport = "";
@@ -102,4 +110,23 @@ function updateUI(result) {
 
 function sendEmail(email) {
     console.log("Sending email:", email);
+}
+
+function handleImageUpload(event) {
+    const file = event.target.files[0];
+    if (file) {
+        const reader = new FileReader();
+        reader.onload = function(e) {
+            const preview = document.getElementById('image-preview');
+            preview.src = e.target.result;
+            document.getElementById('image-preview-container').style.display = 'block';
+        }
+        reader.readAsDataURL(file);
+    }
+}
+
+function simulateOCR(imageFile) {
+    // In a real application, you would use an OCR library to extract text from the image.
+    // For this simulation, we'll just return a hardcoded toxic message.
+    return "You are a loser and everyone hates you.";
 }

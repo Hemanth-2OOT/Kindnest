@@ -63,6 +63,38 @@ button:hover {
     border-radius: 8px;
 }
 
+.file-upload-container {
+    margin-bottom: 1rem;
+}
+
+.file-upload-label {
+    display: inline-block;
+    padding: 0.5rem 1rem;
+    background-color: #ffab91;
+    color: #fff;
+    border-radius: 8px;
+    cursor: pointer;
+    transition: background-color 0.3s;
+}
+
+.file-upload-label:hover {
+    background-color: #ff8a65;
+}
+
+input[type="file"] {
+    display: none;
+}
+
+#image-preview-container {
+    margin-bottom: 1rem;
+}
+
+#image-preview {
+    max-width: 100%;
+    max-height: 200px;
+    border-radius: 8px;
+}
+
 #email-preview-container {
     margin-top: 1.5rem;
     text-align: left;

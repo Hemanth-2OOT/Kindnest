@@ -11,6 +11,13 @@
         <h1>KindNest</h1>
         <p>A safe space to check your messages.</p>
         <textarea id="text-input" placeholder="Paste a message here to see if it's kind."></textarea>
+        <div class="file-upload-container">
+            <label for="screenshot-upload" class="file-upload-label">Upload Screenshot (optional)</label>
+            <input type="file" id="screenshot-upload" accept="image/*">
+        </div>
+        <div id="image-preview-container" style="display: none;">
+            <img id="image-preview" src="#" alt="Image Preview">
+        </div>
         <input type="email" id="parent-email" placeholder="Enter a trusted adult's email (optional)">
         <button id="analyze-btn">Check Message</button>
         <div id="result"></div>
