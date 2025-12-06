@@ -8,12 +8,43 @@ from google import genai
 from google.genai import types
 from pydantic import BaseModel
 from typing import List, Optional
+import resend
 
 logging.basicConfig(level=logging.INFO)
 
 app = Flask(__name__, static_folder='static')
 
 client = None
+
+def get_resend_credentials():
+    hostname = os.environ.get("REPLIT_CONNECTORS_HOSTNAME")
+    x_replit_token = None
+    
+    if os.environ.get("REPL_IDENTITY"):
+        x_replit_token = "repl " + os.environ.get("REPL_IDENTITY")
+    elif os.environ.get("WEB_REPL_RENEWAL"):
+        x_replit_token = "depl " + os.environ.get("WEB_REPL_RENEWAL")
+    
+    if not x_replit_token or not hostname:
+        return None, None
+    
+    try:
+        import urllib.request
+        req = urllib.request.Request(
+            f"https://{hostname}/api/v2/connection?include_secrets=true&connector_names=resend",
+            headers={
+                "Accept": "application/json",
+                "X_REPLIT_TOKEN": x_replit_token
+            }
+        )
+        with urllib.request.urlopen(req) as response:
+            data = json.loads(response.read().decode())
+            connection = data.get("items", [{}])[0]
+            settings = connection.get("settings", {})
+            return settings.get("api_key"), settings.get("from_email")
+    except Exception as e:
+        logging.error(f"Error getting Resend credentials: {e}")
+        return None, None
 
 def get_gemini_client():
     global client
@@ -171,10 +202,49 @@ def fallback_analysis(text: str) -> dict:
         "emotional_support": support
     }
 
-def generate_email_report(result: dict, parent_email: str) -> str:
+def generate_email_report(result: dict, parent_email: str) -> tuple:
     categories_text = ", ".join(result["categories"]) if result["categories"] else "concerning content"
     
     email_html = f"""
+        <html>
+        <body style="font-family: Arial, sans-serif; line-height: 1.6; color: #333;">
+        <div style="max-width: 600px; margin: 0 auto; padding: 20px;">
+            <h2 style="color: #e74c3c;">KindNest Alert - Support May Be Needed</h2>
+            <hr style="margin: 1rem 0; border: none; border-top: 2px solid #e74c3c;">
+            <p>Dear Trusted Adult,</p>
+            <p>This is an automated alert from <strong>KindNest</strong>, an AI-powered cyberbullying prevention system.</p>
+            <p>A message was analyzed and found to contain <strong style="color: #e74c3c;">{categories_text}</strong> with a toxicity score of <strong style="color: #e74c3c;">{result["toxicity_score"]}%</strong>.</p>
+            <p><strong>What this means:</strong> {result["explanation"]}</p>
+            <div style="background-color: #f8f9fa; padding: 15px; border-radius: 8px; margin: 20px 0;">
+                <p style="margin: 0;"><strong>Recommended action:</strong> We encourage you to have a calm, supportive conversation with your child. The goal is to provide comfort and safety, not to punish or blame. Ask open-ended questions about how they're feeling and reassure them that they can come to you with any concerns.</p>
+            </div>
+            <p>Remember, experiencing cyberbullying can cause feelings of sadness, anxiety, or isolation. Your support can make a significant difference.</p>
+            <p>With care,<br><strong>The KindNest Team</strong></p>
+        </div>
+        </body>
+        </html>
+    """
+    
+    api_key, from_email = get_resend_credentials()
+    email_sent = False
+    
+    if api_key and from_email:
+        try:
+            resend.api_key = api_key
+            email_response = resend.Emails.send({
+                "from": from_email,
+                "to": [parent_email],
+                "subject": "KindNest Alert - Support May Be Needed",
+                "html": email_html
+            })
+            logging.info(f"Email sent successfully to {parent_email}: {email_response}")
+            email_sent = True
+        except Exception as e:
+            logging.error(f"Error sending email: {e}")
+    else:
+        logging.warning("Resend not configured, email not sent")
+    
+    preview_html = f"""
         <p><strong>To:</strong> {parent_email}</p>
         <p><strong>Subject:</strong> KindNest Alert - Support May Be Needed</p>
         <hr style="margin: 1rem 0; border: none; border-top: 1px solid #ddd;">
@@ -182,13 +252,11 @@ def generate_email_report(result: dict, parent_email: str) -> str:
         <p>This is an automated alert from KindNest, an AI-powered cyberbullying prevention system.</p>
         <p>A message was analyzed and found to contain <strong>{categories_text}</strong> with a toxicity score of <strong>{result["toxicity_score"]}%</strong>.</p>
         <p><strong>What this means:</strong> {result["explanation"]}</p>
-        <p><strong>Recommended action:</strong> We encourage you to have a calm, supportive conversation with your child. The goal is to provide comfort and safety, not to punish or blame. Ask open-ended questions about how they're feeling and reassure them that they can come to you with any concerns.</p>
-        <p>Remember, experiencing cyberbullying can cause feelings of sadness, anxiety, or isolation. Your support can make a significant difference.</p>
+        <p><strong>Recommended action:</strong> We encourage you to have a calm, supportive conversation with your child.</p>
         <p>With care,<br>The KindNest Team</p>
     """
     
-    logging.info(f"Email report generated for: {parent_email}")
-    return email_html
+    return preview_html, email_sent
 
 @app.route('/')
 def index():
@@ -211,8 +279,7 @@ def analyze():
     email_preview = None
     
     if result["toxicity_score"] >= 40 and parent_email:
-        email_preview = generate_email_report(result, parent_email)
-        email_sent = True
+        email_preview, email_sent = generate_email_report(result, parent_email)
     
     return jsonify({
         "toxicity_score": result["toxicity_score"],

@@ -6,9 +6,9 @@ KindNest is an AI-powered cyberbullying prevention and emotional support system 
 **Current State**: Fully functional web application with Gemini AI integration
 
 ## Features
-1. **Toxicity Analysis**: AI-powered detection with 0-100% scoring
+1. **Toxicity Analysis**: AI-powered detection with 0-100% scoring using Gemini 2.5 Flash
 2. **Emotional Support**: Personalized comfort messages for recipients
-3. **Parent Alert**: Email report generation for trusted adults when harmful content detected
+3. **Parent Alert**: Automatic email sending via Resend to trusted adults when harmful content detected (toxicity >= 40%)
 4. **Screenshot Analysis**: Upload images for text extraction and analysis
 5. **Fallback System**: Keyword-based analysis when AI is unavailable
 

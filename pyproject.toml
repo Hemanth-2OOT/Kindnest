@@ -8,5 +8,6 @@ dependencies = [
     "google-genai>=1.53.0",
     "gunicorn>=23.0.0",
     "pydantic>=2.12.5",
+    "resend>=2.19.0",
     "sift-stack-py>=0.9.3",
 ]
