@@ -1,53 +1,62 @@
 # KindNest
 
 ## Overview
-KindNest is a cyberbullying detection tool that helps users check if messages contain harmful or toxic content. It's designed as a safe space for young people to analyze messages they receive.
+KindNest is an AI-powered cyberbullying prevention and emotional support system designed to make online communication safer, especially for students and teenagers. Users can paste or upload messages/screenshots from any platform, and the AI analyzes content for toxicity, harassment, hate speech, threats, and emotional harm.
 
-**Current State**: Fully functional static web application running on Replit
-
-## Project Type
-- **Frontend**: Static HTML/CSS/JavaScript application
-- **Backend**: None (client-side only)
-- **Server**: Simple Python HTTP server for serving static files
+**Current State**: Fully functional web application with Gemini AI integration
 
 ## Features
-- Text analysis for toxic content detection
-- Keyword-based toxicity scoring system
-- Screenshot upload with simulated OCR
-- Email alert preview for trusted adults
-- Emotional support messaging
+1. **Toxicity Analysis**: AI-powered detection with 0-100% scoring
+2. **Emotional Support**: Personalized comfort messages for recipients
+3. **Parent Alert**: Email report generation for trusted adults when harmful content detected
+4. **Screenshot Analysis**: Upload images for text extraction and analysis
+5. **Fallback System**: Keyword-based analysis when AI is unavailable
+
+## Project Type
+- **Frontend**: HTML/CSS/JavaScript
+- **Backend**: Python Flask API
+- **AI**: Google Gemini 2.5 Flash for content analysis
 
 ## Project Structure
 ```
 .
-├── index.html       # Main application page
-├── style.css        # Styling with Nunito font
-├── script.js        # Client-side logic for toxicity detection
-├── server.py        # Python HTTP server (serves static files on port 5000)
-├── README.md        # Basic project readme
-└── LICENSE          # Project license
+├── index.html           # Main application page
+├── static/
+│   ├── style.css        # Modern UI styling
+│   └── script.js        # Frontend logic and API calls
+├── server.py            # Flask backend with Gemini integration
+├── replit.md            # Project documentation
+├── README.md            # Basic readme
+└── LICENSE              # Project license
 ```
 
 ## Technical Details
-- **Port**: 5000 (frontend server)
+- **Port**: 5000 (Flask server)
 - **Host**: 0.0.0.0 (allows Replit proxy access)
-- **Caching**: Disabled via Cache-Control headers for development
-- **Analysis**: Client-side keyword matching (simulated ML)
+- **AI Model**: Gemini 2.5 Flash
+- **Fallback**: Keyword-based toxicity detection
 
-## Toxicity Detection
-The application uses a keyword-based system with four severity levels:
-- **80%+**: Threats, hate speech
-- **60%+**: Bullying, harassment
-- **40%+**: Body shaming, verbal abuse
-- **20%+**: Unkind content
+## Environment Variables
+- `GEMINI_API_KEY`: Required for AI-powered analysis (falls back to keyword analysis if not set)
+
+## Toxicity Levels
+- **0-20%**: Safe and kind
+- **21-40%**: Mildly concerning
+- **41-60%**: Moderately toxic
+- **61-80%**: Highly toxic
+- **81-100%**: Severely toxic (threats/hate speech)
+
+## API Endpoints
+- `GET /`: Serves the main application
+- `GET /static/<file>`: Serves static assets
+- `POST /api/analyze`: Analyzes text/images for toxicity
 
 ## Running the Application
 The workflow "Start application" runs `python3 server.py` which:
-1. Serves static files from the project directory
-2. Listens on 0.0.0.0:5000
-3. Disables caching for immediate updates
+1. Starts Flask on 0.0.0.0:5000
+2. Serves the frontend UI
+3. Processes analysis requests via Gemini AI
 
-## Deployment Notes
-- This is a static application suitable for static deployment
-- No build process required
-- All files served as-is
+## Deployment
+- Configured for autoscale deployment using gunicorn
+- Production command: `gunicorn --bind=0.0.0.0:5000 server:app`

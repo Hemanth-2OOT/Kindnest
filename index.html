@@ -3,29 +3,111 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>KindNest</title>
-    <link rel="stylesheet" href="style.css">
+    <title>KindNest - AI-Powered Cyberbullying Prevention</title>
+    <link rel="stylesheet" href="static/style.css">
+    <link href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700&display=swap" rel="stylesheet">
 </head>
 <body>
-    <div class="container">
-        <h1>KindNest</h1>
-        <p>A safe space to check your messages.</p>
-        <textarea id="text-input" placeholder="Paste a message here to see if it's kind."></textarea>
-        <div class="file-upload-container">
-            <label for="screenshot-upload" class="file-upload-label">Upload Screenshot (optional)</label>
-            <input type="file" id="screenshot-upload" accept="image/*">
-        </div>
-        <div id="image-preview-container" style="display: none;">
-            <img id="image-preview" src="#" alt="Image Preview">
-        </div>
-        <input type="email" id="parent-email" placeholder="Enter a trusted adult's email (optional)">
-        <button id="analyze-btn">Check Message</button>
-        <div id="result"></div>
-        <div id="email-preview-container" style="display: none;">
-            <h2>Email Preview:</h2>
-            <div id="email-preview"></div>
+    <div class="app-container">
+        <header class="header">
+            <div class="logo">
+                <span class="logo-icon">🛡️</span>
+                <h1>KindNest</h1>
+            </div>
+            <p class="tagline">AI-Powered Cyberbullying Prevention & Emotional Support</p>
+        </header>
+
+        <main class="main-content">
+            <section class="input-section">
+                <div class="input-card">
+                    <h2>Check Your Message</h2>
+                    <p class="description">Paste any message, comment, or text you've received to analyze it for harmful content. We're here to help, not to judge.</p>
+                    
+                    <div class="input-group">
+                        <textarea id="text-input" placeholder="Paste a message here to check if it's safe and kind..."></textarea>
+                    </div>
+
+                    <div class="file-upload-wrapper">
+                        <label for="screenshot-upload" class="upload-btn">
+                            <span class="upload-icon">📷</span>
+                            Upload Screenshot (optional)
+                        </label>
+                        <input type="file" id="screenshot-upload" accept="image/*">
+                    </div>
+
+                    <div id="image-preview-container" class="image-preview" style="display: none;">
+                        <img id="image-preview" src="#" alt="Screenshot Preview">
+                        <button id="remove-image" class="remove-btn">Remove</button>
+                    </div>
+
+                    <div class="email-section">
+                        <label for="parent-email">Trusted Adult's Email (optional)</label>
+                        <p class="email-hint">If harmful content is detected, we can send a supportive alert to a trusted adult.</p>
+                        <input type="email" id="parent-email" placeholder="parent@email.com">
+                    </div>
+
+                    <button id="analyze-btn" class="analyze-btn">
+                        <span class="btn-icon">🔍</span>
+                        Analyze Message
+                    </button>
+                </div>
+            </section>
+
+            <section id="results-section" class="results-section" style="display: none;">
+                <div class="results-header">
+                    <h2>Analysis Results</h2>
+                </div>
+
+                <div class="results-grid">
+                    <div class="result-card toxicity-card">
+                        <div class="card-header">
+                            <span class="card-icon">📊</span>
+                            <h3>Toxicity Analysis</h3>
+                        </div>
+                        <div class="toxicity-meter">
+                            <div class="meter-bar">
+                                <div id="toxicity-fill" class="meter-fill"></div>
+                            </div>
+                            <span id="toxicity-score" class="score-value">0%</span>
+                        </div>
+                        <div id="toxicity-explanation" class="explanation"></div>
+                        <div id="categories" class="categories"></div>
+                    </div>
+
+                    <div class="result-card support-card">
+                        <div class="card-header">
+                            <span class="card-icon">💚</span>
+                            <h3>Emotional Support</h3>
+                        </div>
+                        <div id="emotional-support" class="support-message"></div>
+                    </div>
+
+                    <div id="email-card" class="result-card email-card" style="display: none;">
+                        <div class="card-header">
+                            <span class="card-icon">📧</span>
+                            <h3>Alert Sent to Trusted Adult</h3>
+                        </div>
+                        <div id="email-preview" class="email-content"></div>
+                    </div>
+                </div>
+
+                <button id="new-check-btn" class="new-check-btn">Check Another Message</button>
+            </section>
+        </main>
+
+        <footer class="footer">
+            <p>KindNest - Creating a culture of kindness online</p>
+            <p class="footer-note">Your messages are analyzed securely and never stored.</p>
+        </footer>
+    </div>
+
+    <div id="loading-overlay" class="loading-overlay" style="display: none;">
+        <div class="loading-content">
+            <div class="spinner"></div>
+            <p>Analyzing message with AI...</p>
         </div>
     </div>
-    <script src="script.js"></script>
+
+    <script src="static/script.js"></script>
 </body>
 </html>
